@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Facts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 10px 0;
+            background-color: #007BFF;
+            color: #FFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Number Facts</h1>
+
+<button onclick="getFactAboutFavoriteNumber()">Get Fact About Favorite Number</button>
+<button onclick="getFactsAboutMultipleNumbers()">Get Facts About Multiple Numbers</button>
+<button onclick="getFourFactsAboutFavoriteNumber()">Get 4 Facts About Favorite Number</button>
+
+<div id="facts">
+    
+</div>
+
+<script>
+    const favoriteNumber = 7; 
+
+    function getFactAboutFavoriteNumber() {
+        fetch(`http://numbersapi.com/${favoriteNumber}?json`)
+            .then(response => response.json())
+            .then(data => {
+                displayFact(data.text);
+            })
+            .catch(error => console.error("There was an error!", error));
+    }
+
+    function getFactsAboutMultipleNumbers() {
+        const numbers = [3, 7, 21]; 
+
+        fetch(`http://numbersapi.com/${numbers.join(',')}?json`)
+            .then(response => response.json())
+            .then(data => {
+                for (let num in data) {
+                    displayFact(data[num].text);
+                }
+            })
+            .catch(error => console.error("There was an error!", error));
+    }
+
+    function getFourFactsAboutFavoriteNumber() {
+        const factsPromises = Array(4).fill().map(() => {
+            return fetch(`http://numbersapi.com/${favoriteNumber}?json`)
+                .then(response => response.json());
+        });
+
+        Promise.all(factsPromises)
+            .then(factsArray => {
+                factsArray.forEach(fact => {
+                    displayFact(fact.text);
+                });
+            })
+            .catch(error => console.error("There was an error!", error));
+    }
+
+    function displayFact(fact) {
+        const factsContainer = document.getElementById("facts");
+        const factElement = document.createElement("p");
+        factElement.innerText = fact;
+        factsContainer.appendChild(factElement);
+    }
+</script>
+
+</body>
+</html>
